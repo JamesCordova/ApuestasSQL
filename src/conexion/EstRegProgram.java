@@ -246,7 +246,7 @@ public class EstRegProgram {
             descripcionTextField.setText("");
             estRegTextField.setText("A");
         } catch (SQLException e) {
-            mostrarError("Error al adicionar el registro: " + e.getMessage());;
+            mostrarError("Error al modificar el registro: " + e.getMessage());;
         }
     }
     /* Comando Modificar; se selecciona con un click el registro de la grilla que se desea modificar,
@@ -259,9 +259,9 @@ protegiendo el dato código y estado de registro). */
 
         if (selectedRow >= 0 && codigoTextField.isEditable() == true) {
         	
-        	String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
-            String estReg = (String) tableModel.getValueAt(selectedRow, 2);
+        	String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -308,8 +308,8 @@ protegiendo el dato código, descripción y estado de registro).*/
     private void eliminarRegistro() {
         int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -329,8 +329,8 @@ protegiendo el dato código, descripción y estado de registro). */
     private void inactivarRegistro() {
         int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -349,8 +349,8 @@ protegiendo el dato código, descripción y estado de registro). */
     private void reactivarRegistro() {
         int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -389,7 +389,7 @@ protegiendo el dato código, descripción y estado de registro). */
             descripcionTextField.setEditable(true);
             estRegTextField.setText("A");
         } catch (SQLException e) {
-            mostrarError("Error al adicionar el registro: " + e.getMessage());;
+            mostrarError("Error al actualizar el registro: " + e.getMessage());;
         }
     }
 
