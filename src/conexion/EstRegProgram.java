@@ -156,7 +156,7 @@ public class EstRegProgram {
         JButton actualizarButton = new JButton("Actualizar");
         actualizarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                modificarRegistro();
+                actualizarRegistro();
             }
         });
         panel2.add(actualizarButton);
@@ -203,7 +203,7 @@ public class EstRegProgram {
             // Asignar el modelo a la tabla
             tablaEstadoRegistro.setModel(tableModel);
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
     }
 
@@ -225,6 +225,10 @@ public class EstRegProgram {
         String codigo = codigoTextField.getText();
         String descripcion = descripcionTextField.getText();
         String estReg = estRegTextField.getText();
+        
+        if(codigo.isEmpty() || codigo.isBlank()) {
+        	mostrarError("El código esta en blanco o no es válido");
+        }
 
         try {
             String query = "INSERT INTO estado_registro (EstReg, EstRegDes, EstRegEstReg) VALUES (?, ?, ?)";
@@ -244,7 +248,7 @@ public class EstRegProgram {
             descripcionTextField.setText("");
             estRegTextField.setText("A");
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
     }
     /* Comando Modificar; se selecciona con un click el registro de la grilla que se desea modificar,
@@ -293,7 +297,7 @@ protegiendo el dato código y estado de registro). */
                 descripcionTextField.setEditable(true);
                 estRegTextField.setText("A");
             } catch (SQLException e) {
-                e.printStackTrace();
+                mostrarError("Error al adicionar el registro: " + e.getMessage());;
             }
         }
     }
@@ -358,12 +362,44 @@ protegiendo el dato código, descripción y estado de registro). */
 
         }
     }
+    
+    private void actualizarRegistro() {
+    	String codigo = null;
+        String descripcion = null;
+        String estReg = null;
+    	try {
+        	codigo = codigoTextField.getText();
+            descripcion = descripcionTextField.getText();
+            estReg = estRegTextField.getText();
+            
+            String query = "UPDATE estado_registro SET EstRegDes = ?, estRegEstReg = ? WHERE EstReg = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, descripcion);
+            preparedStatement.setString(2, estReg);
+            preparedStatement.setString(3, codigo);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            // Actualizar la tabla
+            loadData();
+
+            // Limpiar campos de texto
+            codigoTextField.setText("");
+            codigoTextField.setEditable(true);
+            descripcionTextField.setText("");
+            descripcionTextField.setEditable(true);
+            estRegTextField.setText("A");
+        } catch (SQLException e) {
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
+        }
+    }
 
     private void cancelarRegistro() {
         codigoTextField.setText("");
-        codigoTextField.setEditable(false);
+        codigoTextField.setEditable(true);
         descripcionTextField.setText("");
-        descripcionTextField.setEditable(false);
+        descripcionTextField.setEditable(true);
         estRegTextField.setText("A");
     }
 
@@ -373,11 +409,16 @@ protegiendo el dato código, descripción y estado de registro). */
                 connection.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
 
         System.exit(0);
     }
+    
+    private static void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -385,7 +426,7 @@ protegiendo el dato código, descripción y estado de registro). */
                 EstRegProgram cargoProgram = new EstRegProgram();
                 cargoProgram.createAndShowGUI();
             } catch (SQLException e) {
-                e.printStackTrace();
+                mostrarError("Error al adicionar el registro: " + e.getMessage());;
             }
         });
     }
