@@ -5,7 +5,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.DriverManager;
 import java.sql.*;
 
 public class TorProgram {
@@ -18,7 +17,7 @@ public class TorProgram {
     private JTable tablaEstadoRegistro;
 
     public TorProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "gimGonza");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
         statement = connection.createStatement();
     }
 
@@ -256,7 +255,7 @@ protegiendo el dato código y estado de registro). */
 
         if (selectedRow >= 0 && codigoTextField.isEditable() == true) {
         	
-        	String codigo = (String) tableModel.getValueAt(selectedRow, 0);
+        	String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
             String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
             String estReg = (String) tableModel.getValueAt(selectedRow, 2);
 
@@ -359,9 +358,9 @@ protegiendo el dato código, descripción y estado de registro). */
 
     private void cancelarRegistro() {
         codigoTextField.setText("");
-        codigoTextField.setEditable(false);
+        codigoTextField.setEditable(true);
         descripcionTextField.setText("");
-        descripcionTextField.setEditable(false);
+        descripcionTextField.setEditable(true);
         estRegTextField.setText("A");
     }
 
