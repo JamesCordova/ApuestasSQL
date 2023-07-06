@@ -326,10 +326,12 @@ protegiendo el dato código, descripción y estado de registro). */
     private void inactivarRegistro() {
         int selectedRow = tablaEstadoRegistro.getSelectedRow();
         if (selectedRow >= 0) {
-        	int codigo = Integer.parseInt(codigoTextField.getText());
+            int codigo = (int) tableModel.getValueAt(selectedRow, 0);
             String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
 
-            codigoTextField.setText(Integer.toString(codigo));
+            String codigoStr = String.valueOf(codigo);
+
+            codigoTextField.setText(codigoStr);
             codigoTextField.setEditable(false);
             descripcionTextField.setText(descripcion);
             descripcionTextField.setEditable(false);
@@ -346,15 +348,16 @@ protegiendo el dato código, descripción y estado de registro). */
     private void reactivarRegistro() {
         int selectedRow = tablaEstadoRegistro.getSelectedRow();
         if (selectedRow >= 0) {
-        	int codigo = Integer.parseInt(codigoTextField.getText());
+            int codigo = (int) tableModel.getValueAt(selectedRow, 0);
             String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
 
-            codigoTextField.setText(Integer.toString(codigo));
+            String codigoStr = String.valueOf(codigo);
+
+            codigoTextField.setText(codigoStr);
             codigoTextField.setEditable(false);
             descripcionTextField.setText(descripcion);
             descripcionTextField.setEditable(false);
             estRegTextField.setText("A");
-
         }
     }
 
