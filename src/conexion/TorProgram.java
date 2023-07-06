@@ -27,7 +27,7 @@ public class TorProgram {
     }
 
     public void createAndShowGUI() {
-        JFrame frame = new JFrame("Estado Registro administrador");
+        JFrame frame = new JFrame("Torneo administrador");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
