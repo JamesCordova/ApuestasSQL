@@ -442,7 +442,7 @@ public class TableProgram {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TableProgram cargoProgram = new TableProgram("equipo");
+					TableProgram cargoProgram = new TableProgram("apuesta_cab");
 					cargoProgram.createAndShowGUI();
 
 				} catch (SQLException e) {

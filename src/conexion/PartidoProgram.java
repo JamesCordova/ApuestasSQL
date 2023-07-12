@@ -614,12 +614,12 @@ public class PartidoProgram {
                    String parTorCod = resultSet.getString("ParTorCod");
                    String parEquLocCod = resultSet.getString("ParEquLocCod");
                    String parEquVisCod = resultSet.getString("parEquVisCod");
-                   String parFecAño = resultSet.getString("ParFecAño");
-                   String parFecMes = resultSet.getString("ParFecMes");
-                   String parFecDia = resultSet.getString("ParFecDia");
+                   String parFecAño = String.format("%02d", Integer.parseInt(resultSet.getString("ParFecAño")));
+                   String parFecMes = String.format("%02d", Integer.parseInt(resultSet.getString("ParFecMes")));
+                   String parFecDia = String.format("%02d", Integer.parseInt(resultSet.getString("ParFecDia")));
                    String parFecAñoMesDia = parFecAño + parFecMes + parFecDia;
-                   String parFecHor = resultSet.getString("ParFecHor");
-                   String parFecMin = resultSet.getString("ParFecMin");
+                   String parFecHor = String.format("%02d", Integer.parseInt(resultSet.getString("ParFecHor")));
+                   String parFecMin = String.format("%02d", Integer.parseInt(resultSet.getString("ParFecMin")));
                    String parFecHorMin = parFecHor + parFecMin;
                    String parGanCod = resultSet.getString("ParGanCod");
                    // Establecer valores

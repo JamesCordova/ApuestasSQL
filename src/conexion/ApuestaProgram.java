@@ -432,12 +432,19 @@ public class ApuestaProgram {
 
     private void cancelarRegistro() {
     	apuCodTextField.setText("");
+    	apuCodTextField.setEditable(true);
         apuCliCodTextField.setText("");
+        apuCliCodTextField.setEditable(true);
         apuAfiCodTextField.setText("");
+        apuAfiCodTextField.setEditable(true);
         apuFecAñoMesDiaTextField.setText("");
+        apuFecAñoMesDiaTextField.setEditable(true);
         apuFecHorMinTextField.setText("");
+        apuFecHorMinTextField.setEditable(true);
         apuTipTextField.setText("");
+        apuTipTextField.setEditable(true);
         apuValApoTextField.setText("");
+        apuValApoTextField.setEditable(true);
         apuEstRegTextField.setText("A");
     }
 

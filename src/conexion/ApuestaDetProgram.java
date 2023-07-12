@@ -383,9 +383,13 @@ public class ApuestaDetProgram {
 
 	private void limpiarCampos() {
 		codigoTextField.setText("");
+		codigoTextField.setEditable(true);
 		cabeceraComboBox.setSelectedIndex(0);
+		cabeceraComboBox.setEditable(true);
 		partidoComboBox.setSelectedIndex(0);
+		partidoComboBox.setEditable(true);
 		cuotaTextField.setText("");
+		cuotaTextField.setEditable(true);
 		estRegTextField.setText("A");
 	}
 
