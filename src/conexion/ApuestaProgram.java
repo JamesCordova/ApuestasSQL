@@ -472,12 +472,12 @@ public class ApuestaProgram {
             if (resultSet.next()) {
                 String apuCliCod = resultSet.getString("ApuCliCod");
                 String apuAfiCod = resultSet.getString("ApuAfiCod");
-                String apuFecAño = resultSet.getString("ApuFecAño");
-                String apuFecMes = resultSet.getString("ApuFecMes");
-                String apuFecDia = resultSet.getString("ApuFecDia");
+                String apuFecAño = String.format("%04d", Integer.parseInt(resultSet.getString("ApuFecAño")));
+                String apuFecMes = String.format("%02d", Integer.parseInt(resultSet.getString("ApuFecMes")));
+                String apuFecDia = String.format("%02d", Integer.parseInt(resultSet.getString("ApuFecDia")));
                 String apuFecAñoMesDia = apuFecAño + apuFecMes + apuFecDia;
-                String apuFecHor = resultSet.getString("ApuFecHor");
-                String apuFecMin = resultSet.getString("ApuFecMin");
+                String apuFecHor = String.format("%02d", Integer.parseInt(resultSet.getString("ApuFecHor")));
+                String apuFecMin = String.format("%02d", Integer.parseInt(resultSet.getString("ApuFecMin")));
                 String apuFecHorMin = apuFecHor + apuFecMin;
                 String apuTip = resultSet.getString("ApuTip");
                 String apuValApo = resultSet.getString("ApuValApo");

@@ -256,8 +256,8 @@ protegiendo el dato código y estado de registro). */
         if (selectedRow >= 0 && codigoTextField.isEditable() == true) {
         	
         	String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
-            String estReg = (String) tableModel.getValueAt(selectedRow, 2);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -272,7 +272,7 @@ protegiendo el dato código y estado de registro). */
                 String descripcion = descripcionTextField.getText();
                 String estReg = estRegTextField.getText();
                 
-                String query = "UPDATE TORNEO SET TorCod = ?, TorNom = ?, TorEstReg = ? WHERE TorCod = ?";
+                String query = "UPDATE TORNEO SET TorNom = ?, TorEstReg = ? WHERE TorCod = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 preparedStatement.setString(1, descripcion);
                 preparedStatement.setString(2, estReg);
@@ -304,8 +304,8 @@ protegiendo el dato código, descripción y estado de registro).*/
     private void eliminarRegistro() {
         int selectedRow = tablaEstadoRegistro.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -324,8 +324,8 @@ protegiendo el dato código, descripción y estado de registro). */
     private void inactivarRegistro() {
         int selectedRow = tablaEstadoRegistro.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" +  tableModel.getValueAt(selectedRow, 1);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -344,8 +344,8 @@ protegiendo el dato código, descripción y estado de registro). */
     private void reactivarRegistro() {
         int selectedRow = tablaEstadoRegistro.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);

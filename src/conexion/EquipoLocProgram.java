@@ -322,6 +322,7 @@ public class EquipoLocProgram {
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
             equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            equipoComboBox.setEditable(false);
             estRegTextField.setText("*");
         }
     }
@@ -335,6 +336,7 @@ public class EquipoLocProgram {
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
             equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            equipoComboBox.setEditable(false);
             estRegTextField.setText("I");
         }
     }
@@ -348,6 +350,7 @@ public class EquipoLocProgram {
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
             equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            equipoComboBox.setEditable(false);
             estRegTextField.setText("A");
         }
     }
@@ -380,6 +383,7 @@ public class EquipoLocProgram {
             codigoTextField.setText("");
             codigoTextField.setEditable(true);
             equipoComboBox.setSelectedIndex(0);
+            equipoComboBox.setEditable(true);
         } catch (SQLException e) {
             mostrarError("Error al actualizar el registro: " + e.getMessage());
         }
@@ -389,6 +393,7 @@ public class EquipoLocProgram {
         codigoTextField.setText("");
         codigoTextField.setEditable(true);
         equipoComboBox.setSelectedIndex(0);
+        equipoComboBox.setEditable(true);
         estRegTextField.setText("A");
     }
 

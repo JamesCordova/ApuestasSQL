@@ -28,7 +28,7 @@ public class CliProgram {
     }
 
     public void createAndShowGUI() {
-        JFrame frame = new JFrame("CLientes administrador");
+        JFrame frame = new JFrame("Clientes administrador");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -62,8 +62,8 @@ public class CliProgram {
 
         constraints.gridy = 1;
         constraints.gridx = 0;
-        JLabel descripcionLabel = new JLabel("Descripción:");
-        panel.add(descripcionLabel, constraints);
+        JLabel dniLabel = new JLabel("Dni:");
+        panel.add(dniLabel, constraints);
 
         constraints.gridx = 1;
         dniTextField = new JTextField(40);
@@ -71,7 +71,7 @@ public class CliProgram {
         
         constraints.gridy = 2;
         constraints.gridx = 0;
-        JLabel nombreLabel = new JLabel("Descripción:");
+        JLabel nombreLabel = new JLabel("Nombre:");
         panel.add(nombreLabel, constraints);
 
         constraints.gridx = 1;
@@ -231,7 +231,8 @@ public class CliProgram {
 
     private void adicionarRegistro() {
         String codigo = codigoTextField.getText();
-        String descripcion = dniTextField.getText();
+        String dni = dniTextField.getText();
+        String nombre = nombreTextField.getText();
         String estReg = estRegTextField.getText();
         
         if(codigo.isEmpty() || codigo.isBlank()) {
@@ -239,11 +240,12 @@ public class CliProgram {
         }
 
         try {
-            String query = "INSERT INTO afiliado (AfiCod, AFiNom, AfiEstReg) VALUES (?, ?, ?)";
+            String query = "INSERT INTO CLIENTE (CliCod, CliDni, CliNom, CliEstReg) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, codigo);
-            preparedStatement.setString(2, descripcion);
-            preparedStatement.setString(3, estReg);
+            preparedStatement.setString(2, dni);
+            preparedStatement.setString(3, nombre);
+            preparedStatement.setString(4, estReg);
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -252,9 +254,7 @@ public class CliProgram {
             loadData();
 
             // Limpiar campos de texto
-            codigoTextField.setText("");
-            dniTextField.setText("");
-            estRegTextField.setText("A");
+            cancelarRegistro();
         } catch (SQLException e) {
             mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
@@ -270,12 +270,14 @@ protegiendo el dato código y estado de registro). */
         if (selectedRow >= 0 && codigoTextField.isEditable() == true) {
         	
         	String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
-            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
+            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            dniTextField.setText(descripcion);
+            dniTextField.setText(dni);
+            nombreTextField.setText(nombre);
             estRegTextField.setText(estReg);
             
             
@@ -283,14 +285,16 @@ protegiendo el dato código y estado de registro). */
         else{
             try {
             	String codigo = codigoTextField.getText();
-                String descripcion = dniTextField.getText();
+                String dni = dniTextField.getText();
+                String nombre = nombreTextField.getText();
                 String estReg = estRegTextField.getText();
                 
-                String query = "UPDATE afiliado SET AfiNom = ?, AfiEstReg = ? WHERE AfiCod = ?";
+                String query = "UPDATE cliente SET CliDni = ?, CliNom = ?, CliEstReg = ? WHERE CliCod = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setString(1, descripcion);
-                preparedStatement.setString(2, estReg);
-                preparedStatement.setString(3, codigo);
+                preparedStatement.setString(1, dni);
+                preparedStatement.setString(2, nombre);
+                preparedStatement.setString(3, estReg);
+                preparedStatement.setString(4, codigo);
 
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
@@ -299,11 +303,7 @@ protegiendo el dato código y estado de registro). */
                 loadData();
 
                 // Limpiar campos de texto
-                codigoTextField.setText("");
-                codigoTextField.setEditable(true);
-                dniTextField.setText("");
-                dniTextField.setEditable(true);
-                estRegTextField.setText("A");
+                cancelarRegistro();
             } catch (SQLException e) {
                 mostrarError("Error al modificar el registro: " + e.getMessage());;
             }
@@ -319,12 +319,15 @@ protegiendo el dato código, descripción y estado de registro).*/
         int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            dniTextField.setText(descripcion);
+            dniTextField.setText(dni);
             dniTextField.setEditable(false);
+            nombreTextField.setText(nombre);
+            nombreTextField.setEditable(false);
             estRegTextField.setText("*");
 
         }
@@ -340,12 +343,15 @@ protegiendo el dato código, descripción y estado de registro). */
         int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            dniTextField.setText(descripcion);
+            dniTextField.setText(dni);
             dniTextField.setEditable(false);
+            nombreTextField.setText(nombre);
+            nombreTextField.setEditable(false);
             estRegTextField.setText("I");
 
         }
@@ -360,12 +366,15 @@ protegiendo el dato código, descripción y estado de registro). */
         int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            dniTextField.setText(descripcion);
+            dniTextField.setText(dni);
             dniTextField.setEditable(false);
+            nombreTextField.setText(nombre);
+            nombreTextField.setEditable(false);
             estRegTextField.setText("A");
 
         }
@@ -373,18 +382,21 @@ protegiendo el dato código, descripción y estado de registro). */
     
     private void actualizarRegistro() {
     	String codigo = null;
-        String descripcion = null;
+        String dni = null;
+        String nombre = null;
         String estReg = null;
     	try {
         	codigo = codigoTextField.getText();
-            descripcion = dniTextField.getText();
+            dni = dniTextField.getText();
+            nombre = nombreTextField.getText();
             estReg = estRegTextField.getText();
             
-            String query = "UPDATE afiliado SET AfiNom = ?, AfiEstReg = ? WHERE AfiCod = ?";
+            String query = "UPDATE cliente SET CliDni = ?, CliNom = ?, CliEstReg = ? WHERE CliCod = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, descripcion);
-            preparedStatement.setString(2, estReg);
-            preparedStatement.setString(3, codigo);
+            preparedStatement.setString(1, dni);
+            preparedStatement.setString(2, nombre);
+            preparedStatement.setString(3, estReg);
+            preparedStatement.setString(4, codigo);
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -393,11 +405,7 @@ protegiendo el dato código, descripción y estado de registro). */
             loadData();
 
             // Limpiar campos de texto
-            codigoTextField.setText("");
-            codigoTextField.setEditable(true);
-            dniTextField.setText("");
-            dniTextField.setEditable(true);
-            estRegTextField.setText("A");
+            cancelarRegistro();
         } catch (SQLException e) {
             mostrarError("Error al actualizar el registro: " + e.getMessage());;
         }
