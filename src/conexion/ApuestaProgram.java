@@ -398,10 +398,12 @@ public class ApuestaProgram {
     }
 
     private void relacionarDetalle() {
-        int selectedRow = cabeceraTablaItems.getSelectedRow();
-        if (selectedRow >= 0) {
+        int selectedRowCab = cabeceraTablaItems.getSelectedRow();
+        int selectedRowDet = detalleTablaItems.getSelectedRow();
+        if (selectedRowCab >= 0 && selectedRowDet >= 0) {
             // Obtener el código de la apuesta seleccionada
-            String apuCod = (String) "" + cabeceraTableModel.getValueAt(selectedRow, 0);
+            String apuCod = (String) "" + cabeceraTableModel.getValueAt(selectedRowCab, 0);
+            String apuDetCod = (String) "" + detalleTableModel.getValueAt(selectedRowDet, 0);
 
             // Verificar que el código de apuesta no esté vacío
             if (apuCod.isEmpty()) {
@@ -411,9 +413,10 @@ public class ApuestaProgram {
 
             // Actualizar el ApuCabCod en la tabla APUESTA_DET con el valor de ApuCod
             try {
-                String detalleQuery = "UPDATE APUESTA_DET SET ApuCabCod = ? WHERE ApuCabCod IS NULL";
+                String detalleQuery = "UPDATE APUESTA_DET SET ApuCabCod = ? WHERE ApuDetCod = ?";
                 PreparedStatement detalleStatement = connection.prepareStatement(detalleQuery);
                 detalleStatement.setString(1, apuCod);
+                detalleStatement.setString(2, apuDetCod);
 
                 detalleStatement.executeUpdate();
                 detalleStatement.close();
@@ -421,6 +424,7 @@ public class ApuestaProgram {
                 // Actualizar la tabla de APUESTA_DET
                 loadDetalleData();
             } catch (SQLException e) {
+            	e.printStackTrace();
                 mostrarError("Error al relacionar el detalle de la apuesta: " + e.getMessage());
             }
         }

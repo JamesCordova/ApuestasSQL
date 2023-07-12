@@ -640,8 +640,8 @@ public class PartidoProgram {
               }
       	 }
       	 catch (SQLException e) {
-      		 e.printStackTrace();
-//      		 mostrarError("Error al obtener los campos relacionados: " + e.getMessage());
+      		 
+      		 mostrarError("Error al obtener los campos relacionados: " + e.getMessage());
       	 }
       }
 
