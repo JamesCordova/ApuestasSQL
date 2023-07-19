@@ -446,6 +446,7 @@ public class ApuestaProgram {
         apuValApoTextField.setText("");
         apuValApoTextField.setEditable(true);
         apuEstRegTextField.setText("A");
+        loadDetalleData();
     }
 
     private void inactivarRegistro() {
