@@ -7,5 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.30.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Space/eclipse-workspace/ApuestasSQL/lib/ojdbc10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
