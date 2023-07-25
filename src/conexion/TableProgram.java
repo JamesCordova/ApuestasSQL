@@ -15,13 +15,15 @@ public class TableProgram {
 	private Statement statement;
 	private DefaultTableModel tableModel;
 	private JTextField[] textFields;
-	private JTable tablaEstadoRegistro;
+	private JTable tablaItems;
 	private String selectedTable;
-	DatabaseMetaData metaData;
+	private String tablaEstReg;
+	private String columnEstReg;
 
 	public TableProgram(String table) throws SQLException {
 		connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-		metaData = connection.getMetaData();
+		tablaEstReg = "estado_registro";
+		columnEstReg = "EstReg";
 		selectedTable = table;
 		statement = connection.createStatement();
 	}
@@ -50,31 +52,64 @@ public class TableProgram {
 
 	private JPanel createFormPanel() {
 		JPanel panel = new JPanel(new GridBagLayout());
-		panel.setBorder(createTitledBorder("Registro de Estados de registros"));
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		constraints.anchor = GridBagConstraints.WEST;
-		constraints.insets = new Insets(5, 5, 5, 5);
+	    panel.setBorder(createTitledBorder("Registro de Estados de registros"));
+	    GridBagConstraints constraints = new GridBagConstraints();
+	    constraints.gridx = 0;
+	    constraints.gridy = 0;
+	    constraints.anchor = GridBagConstraints.WEST;
+	    constraints.insets = new Insets(5, 5, 5, 5);
+	    List<String> columnNames = getTableColumnNames(selectedTable);
+	    textFields = new JTextField[columnNames.size()];
+	    JComboBox<String> comboBox = null;
+	    for (int i = 0; i < columnNames.size(); i++) {
+	        String columnName = columnNames.get(i);
+	        JLabel label = new JLabel(columnName + ":");
+	        panel.add(label, constraints);
+	        constraints.gridx = 1;
+	        	
+	        JTextField textField = new JTextField(10);
+	        textFields[i] = textField;
+	        panel.add(textField, constraints);
+	        if (i >= columnNames.size() - 1) {
+	        	textField.setText("A");
+	        	textField.setEditable(false);
+	        }
+	        constraints.gridy++;
+	        constraints.gridx = 0;
+	    }
+	    return panel;
+	}
+	
+	private boolean isForeignKey(String columnName) {
+	    boolean isForeignKey = false;
+	    try {
+	        DatabaseMetaData metaData = connection.getMetaData();
+	        ResultSet foreignKeys = metaData.getImportedKeys(null, null, selectedTable);
+	        while (foreignKeys.next()) {
+	            String foreignKeyColumnName = foreignKeys.getString("FKCOLUMN_NAME");
+	            if (foreignKeyColumnName.equals(columnName)) {
+	                isForeignKey = true;
+	                break;
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return isForeignKey;
+	}
 
-		List<String> columnNames = getTableColumnNames(selectedTable);
-		textFields = new JTextField[columnNames.size()];
-
-		for (int i = 0; i < columnNames.size(); i++) {
-			String columnName = columnNames.get(i);
-			JLabel label = new JLabel(columnName + ":");
-			panel.add(label, constraints);
-
-			constraints.gridx = 1;
-			JTextField textField = new JTextField(10);
-			textFields[i] = textField;
-			panel.add(textField, constraints);
-
-			constraints.gridy++;
-			constraints.gridx = 0;
-		}
-
-		return panel;
+	private String[] getForeignKeyValues(String columnName) {
+	    List<String> values = new ArrayList<>();
+	    try {
+	        Statement statement = connection.createStatement();
+	        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT " + columnName + " FROM " + tablaEstReg);
+	        while (resultSet.next()) {
+	            values.add(resultSet.getString(columnName));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return values.toArray(new String[values.size()]);
 	}
 
 	private JPanel createTablePanel() {
@@ -82,8 +117,8 @@ public class TableProgram {
 
 		panel.setBorder(createTitledBorder("Tabla estados de registros"));
 
-		tablaEstadoRegistro = new JTable();
-		JScrollPane scrollPane = new JScrollPane(tablaEstadoRegistro);
+		tablaItems = new JTable();
+		JScrollPane scrollPane = new JScrollPane(tablaItems);
 		panel.add(scrollPane, BorderLayout.CENTER);
 
 		return panel;
@@ -136,14 +171,30 @@ public class TableProgram {
 			}
 		});
 		panel2.add(inactiveButton);
-
-		JButton activeButton = new JButton("Activar");
-		activeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				activarRegistro();
-			}
-		});
-		panel2.add(activeButton);
+		
+		JButton reactivateButton = new JButton("Reactivar");
+        reactivateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reactivarRegistro();
+            }
+        });
+        panel2.add(reactivateButton);
+        
+        JButton actualizarButton = new JButton("Actualizar");
+        actualizarButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actualizarRegistro();
+            }
+        });
+        panel2.add(actualizarButton);
+        
+        JButton quitButton = new JButton("Salir");
+        quitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                salirPrograma();
+            }
+        });
+        panel2.add(quitButton);
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(panel1, BorderLayout.NORTH);
@@ -182,12 +233,12 @@ public class TableProgram {
 			loadData();
 			clearForm();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			 showError("Error al adicionar: " + e.getMessage());
 		}
 	}
 
 	private void modificarRegistro() {
-		int selectedRow = tablaEstadoRegistro.getSelectedRow();
+		int selectedRow = tablaItems.getSelectedRow();
 		if (selectedRow == -1) {
 			JOptionPane.showMessageDialog(null, "Selecciona un registro para modificar.");
 			return;
@@ -201,8 +252,8 @@ public class TableProgram {
 			values.add(value);
 		}
 
-		String idColumnName = columnNames.get(0);
-		String idValue = values.get(0);
+		String idColumnName = (String) "" + columnNames.get(0);
+		String idValue = (String) "" + values.get(0);
 
 		try {
 			String query = "UPDATE " + tableName + " SET ";
@@ -217,20 +268,20 @@ public class TableProgram {
 			loadData();
 			clearForm();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			 showError("Error al modificar: " + e.getMessage());
 		}
 	}
 
 	private void eliminarRegistro() {
-		int selectedRow = tablaEstadoRegistro.getSelectedRow();
+		int selectedRow = tablaItems.getSelectedRow();
 		if (selectedRow == -1) {
 			JOptionPane.showMessageDialog(null, "Selecciona un registro para eliminar.");
 			return;
 		}
 		String tableName = selectedTable;
 		List<String> columnNames = getTableColumnNames(tableName);
-		String idColumnName = columnNames.get(0);
-		String idValue = (String) tablaEstadoRegistro.getValueAt(selectedRow, 0);
+		String idColumnName = (String) "" + columnNames.get(0);
+		String idValue = (String) " " + tablaItems.getValueAt(selectedRow, 0);
 
 		try {
 			String query = "DELETE FROM " + tableName + " WHERE " + idColumnName + "='" + idValue + "'";
@@ -238,7 +289,7 @@ public class TableProgram {
 			loadData();
 			clearForm();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			 showError("Error al eliminar: " + e.getMessage());
 		}
 	}
 
@@ -247,15 +298,15 @@ public class TableProgram {
 	}
 
 	private void inactivarRegistro() {
-		int selectedRow = tablaEstadoRegistro.getSelectedRow();
+		int selectedRow = tablaItems.getSelectedRow();
 		if (selectedRow == -1) {
 			JOptionPane.showMessageDialog(null, "Selecciona un registro para inactivar.");
 			return;
 		}
 		String tableName = selectedTable;
 		List<String> columnNames = getTableColumnNames(tableName);
-		String idColumnName = columnNames.get(0);
-		String idValue = (String) tablaEstadoRegistro.getValueAt(selectedRow, 0);
+		String idColumnName = (String) "" + columnNames.get(0);
+		String idValue = (String) "" + tablaItems.getValueAt(selectedRow, 0);
 
 		try {
 			String query = "UPDATE " + tableName + " SET estado='inactivo' WHERE " + idColumnName + "='" + idValue + "'";
@@ -267,19 +318,20 @@ public class TableProgram {
 		}
 	}
 
-	private void activarRegistro() {
-		int selectedRow = tablaEstadoRegistro.getSelectedRow();
+	private void reactivarRegistro() {
+		int selectedRow = tablaItems.getSelectedRow();
 		if (selectedRow == -1) {
 			JOptionPane.showMessageDialog(null, "Selecciona un registro para activar.");
 			return;
 		}
 		String tableName = selectedTable;
 		List<String> columnNames = getTableColumnNames(tableName);
-		String idColumnName = columnNames.get(0);
-		String idValue = (String) tablaEstadoRegistro.getValueAt(selectedRow, 0);
+		String idColumnName = (String) "" + columnNames.get(0);
+		String idValue = (String) "" + tablaItems.getValueAt(selectedRow, 0);
+		String idEstReg = (String) "" + columnNames.get(columnNames.size() - 1);
 
 		try {
-			String query = "UPDATE " + tableName + " SET estado='activo' WHERE " + idColumnName + "='" + idValue + "'";
+			String query = "UPDATE " + tableName + " SET " + idEstReg + "='A' WHERE " + idColumnName + "='" + idValue + "'";
 			statement.executeUpdate(query);
 			loadData();
 			clearForm();
@@ -287,21 +339,72 @@ public class TableProgram {
 			e.printStackTrace();
 		}
 	}
+	
+	private void actualizarRegistro() {
+    	String codigo = null;
+        String descripcion = null;
+        String estReg = null;
+        
+    	/*try {
+        	codigo = codigoTextField.getText();
+            descripcion = descripcionTextField.getText();
+            estReg = estRegTextField.getText();
+            
+            String query = "UPDATE estado_registro SET EstRegDes = ?, estRegEstReg = ? WHERE EstReg = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, descripcion);
+            preparedStatement.setString(2, estReg);
+            preparedStatement.setString(3, codigo);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            // Actualizar la tabla
+            loadData();
+
+            // Limpiar campos de texto
+            codigoTextField.setText("");
+            codigoTextField.setEditable(true);
+            descripcionTextField.setText("");
+            descripcionTextField.setEditable(true);
+            estRegTextField.setText("A");
+        } catch (SQLException e) {
+            showError("Error al actualizar el registro: " + e.getMessage());
+        }*/
+    }
+
+    private void salirPrograma() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            showError("Error al desconectarse: " + e.getMessage());
+        }
+
+        System.exit(0);
+    }
+	
 	private void clearForm() {
 		for (JTextField textField : textFields) {
 			textField.setText("");
 		}
-		tablaEstadoRegistro.clearSelection();
+		tablaItems.clearSelection();
+	}
+	
+	private static void showError(String mensaje) {
+		JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	private void loadData() {
 		String tableName = selectedTable;
 		List<String> columnNames = getTableColumnNames(tableName);
-		DefaultTableModel model = (DefaultTableModel) tablaEstadoRegistro.getModel();
-		model.setRowCount(0);
-		System.out.println(tablaEstadoRegistro);
-		System.out.println(columnNames);
-
+		tableModel = new DefaultTableModel();
+		
+		for (int i = 0; i < columnNames.size(); i++) {
+            tableModel.addColumn(columnNames.get(i));
+        }
+		
 		try {
 			String query = "SELECT * FROM " + tableName;
 			ResultSet resultSet = statement.executeQuery(query);
@@ -310,49 +413,41 @@ public class TableProgram {
 				for (int i = 0; i < columnNames.size(); i++) {
 					row[i] = resultSet.getObject(columnNames.get(i));
 				}
-				model.addRow(row);
+				tableModel.addRow(row);
 			}
+			tablaItems.setModel(tableModel);
 			resultSet.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	
 
 	private List<String> getTableColumnNames(String tableName) {
 		List<String> columnNames = new ArrayList<>();
-		try {
-			ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
-			while (resultSet.next()) {
-				String columnName = resultSet.getString("COLUMN_NAME");
-				columnNames.add(columnName);
-			}
-			resultSet.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return columnNames;
-	}
-	private void initializeDatabase() {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-			statement = connection.createStatement();
-			metaData = connection.getMetaData();
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		}
+	    try {
+	    	ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+	        for (int i = 1; i <= columnCount; i++) {
+                columnNames.add(metaData.getColumnLabel(i));
+            }
+	    } catch (SQLException e) {
+	    	showError("Error al obtener registros: " + e.getMessage());
+	    }
+	    return columnNames;
 	}
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TableProgram cargoProgram = new TableProgram("estado_registro");
+					TableProgram cargoProgram = new TableProgram("partido");
 					cargoProgram.createAndShowGUI();
 
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					 showError("Error al conectarse: " + e.getMessage());
 				}
 			}
 		});

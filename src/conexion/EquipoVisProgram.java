@@ -7,27 +7,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class TorProgram {
+public class EquipoVisProgram {
     private Connection connection;
     private Statement statement;
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
-    private JTextField descripcionTextField;
+    private JComboBox<String> equipoComboBox;
     private JTextField estRegTextField;
-    private JTable tablaEstadoRegistro;
+    private JTable tablaItems;
 
-    public TorProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "gimGonza");
+    public EquipoVisProgram() throws SQLException {
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
         statement = connection.createStatement();
     }
-
+    
     private Border createTitledBorder(String title) {
         Border border = BorderFactory.createLineBorder(Color.GRAY);
         return BorderFactory.createTitledBorder(border, title);
     }
 
     public void createAndShowGUI() {
-        JFrame frame = new JFrame("Torneo administrador");
+        JFrame frame = new JFrame("Equipo Visitante");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -41,11 +41,12 @@ public class TorProgram {
         frame.setVisible(true);
 
         loadData();
+        loadEquipos();
     }
 
     private JPanel createFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(createTitledBorder("Registro de Torneos"));
+        panel.setBorder(createTitledBorder("Registro de Equipo Visitante"));
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -56,23 +57,23 @@ public class TorProgram {
         panel.add(codigoLabel, constraints);
 
         constraints.gridx = 1;
-        codigoTextField = new JTextField(8);
+        codigoTextField = new JTextField(10);
         panel.add(codigoTextField, constraints);
 
         constraints.gridy = 1;
         constraints.gridx = 0;
-        JLabel descripcionLabel = new JLabel("Nombre: ");
-        panel.add(descripcionLabel, constraints);
+        JLabel equipoLabel = new JLabel("Equipo:");
+        panel.add(equipoLabel, constraints);
 
         constraints.gridx = 1;
-        descripcionTextField = new JTextField(30);
-        panel.add(descripcionTextField, constraints);
-
+        equipoComboBox = new JComboBox<>();
+        panel.add(equipoComboBox, constraints);
+        
         constraints.gridy = 2;
         constraints.gridx = 0;
         JLabel estRegLabel = new JLabel("Estado Registro:");
         panel.add(estRegLabel, constraints);
-
+        
         constraints.gridy = 2;
         constraints.gridx = 1;
         estRegTextField = new JTextField(2);
@@ -84,12 +85,12 @@ public class TorProgram {
     }
 
     private JPanel createTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new FlowLayout());
+        
+        panel.setBorder(createTitledBorder("Tabla de Equipos Visitantes"));
 
-        panel.setBorder(createTitledBorder("Tabla de torneos"));
-
-        tablaEstadoRegistro = new JTable();
-        JScrollPane scrollPane = new JScrollPane(tablaEstadoRegistro);
+        tablaItems = new JTable();
+        JScrollPane scrollPane = new JScrollPane(tablaItems);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -109,15 +110,23 @@ public class TorProgram {
         JButton updateButton = new JButton("Modificar");
         updateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                modificarRegistro();
+                try {
+					modificarRegistro();
+				} catch (SQLException e1) {
+					mostrarError("Error al acceder a los datos" + e1.getMessage());
+				}
             }
         });
         panel1.add(updateButton);
-
+        
         JButton deleteButton = new JButton("Eliminar");
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                eliminarRegistro();
+                try {
+					eliminarRegistro();
+				} catch (SQLException e1) {
+					mostrarError("Error al acceder a los datos" + e1.getMessage());
+				}
             }
         });
         panel1.add(deleteButton);
@@ -136,7 +145,11 @@ public class TorProgram {
         JButton inactiveButton = new JButton("Inactivar");
         inactiveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                inactivarRegistro();
+                try {
+					inactivarRegistro();
+				} catch (SQLException e1) {
+					mostrarError("Error al acceder a los datos" + e1.getMessage());
+				}
             }
         });
         
@@ -146,7 +159,11 @@ public class TorProgram {
         JButton reactivateButton = new JButton("Reactivar");
         reactivateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                reactivarRegistro();
+                try {
+					reactivarRegistro();
+				} catch (SQLException e1) {
+					mostrarError("Error al acceder a los datos" + e1.getMessage());
+				}
             }
         });
         panel2.add(reactivateButton);
@@ -154,7 +171,7 @@ public class TorProgram {
         JButton actualizarButton = new JButton("Actualizar");
         actualizarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                modificarRegistro();
+                actualizarRegistro();
             }
         });
         panel2.add(actualizarButton);
@@ -172,10 +189,10 @@ public class TorProgram {
         finalPanel.add(panel2, BorderLayout.SOUTH);
         return finalPanel;
     }
-    
+
     private void loadData() {
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM torneo");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM equipo_visitante");
             ResultSetMetaData metaData = resultSet.getMetaData();
 
             // Obtener la cantidad de columnas
@@ -199,36 +216,68 @@ public class TorProgram {
             }
 
             // Asignar el modelo a la tabla
-            tablaEstadoRegistro.setModel(tableModel);
+            tablaItems.setModel(tableModel);
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
     }
-
-    /* Comando Adicionar; se seleccionará el comando Adicionar y se blanqueará las cajas de texto
-    del área de Registro, procediendo a ingresar los datos de código y de descripción (el dato estado
-    de registro se mostrará por defecto la letra A (Activo) y no podrá ser modificado, estando
-    protegido de ello.
-    Se coloca el valor de “1” en el flag o bandera de actualizar (nombre del flag CarFlaAct); que nos
-    indicará que se actualizará un registro en la base de datos.
-    Se selecciona el comando Actualizar para grabar en la tabla de la base de datos y se carga el
-    registro adicionado (código, descripción y estado del registro) en la grilla.
-    Si no se desea Actualizar se selecciona comando Cancelar, se borra los datos del área de Registro
-    y se inactiva el adicionar. Se coloca el flag o bandera de actualizar en valor de “0” no realizará
-    la función de actualizar. */
-
+    
+    private void loadEquipos() {
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM equipo");
+            while (resultSet.next()) {
+                String equipoNom = resultSet.getString("EquNom");
+                equipoComboBox.addItem(equipoNom);
+            }
+        } catch (SQLException e) {
+            mostrarError("Error al cargar los equipos: " + e.getMessage());
+        }
+    }
+    
+    private String getEquipoCod(String equipoNom) throws SQLException {
+        String equipoCod = null;
+        String query = "SELECT EquCod FROM equipo WHERE EquNom = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, equipoNom);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            equipoCod = resultSet.getString("EquCod");
+        }
+        preparedStatement.close();
+        return equipoCod;
+    }
+    
+    private String getEquipoNom(String equipoCod) throws SQLException {
+        String equipoNom = null;
+        String query = "SELECT EquNom FROM equipo WHERE EquCod = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, equipoCod);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            equipoNom = resultSet.getString("EquNom");
+        }
+        preparedStatement.close();
+        return equipoNom;
+    }
 
 
     private void adicionarRegistro() {
         String codigo = codigoTextField.getText();
-        String descripcion = descripcionTextField.getText();
+        String equipoNom = (String) equipoComboBox.getSelectedItem();
         String estReg = estRegTextField.getText();
+        
+        if(codigo.isEmpty() || codigo.isBlank()) {
+            mostrarError("El código está en blanco o no es válido");
+            return;
+        }
 
         try {
-            String query = "INSERT INTO torneo (TorCod, TorNom, TorEstReg) VALUES (?, ?, ?)";
+        	
+        	String equipoCod = getEquipoCod(equipoNom);
+            String query = "INSERT INTO equipo_visitante (EquVisCod, EquCod, EquVisEstReg) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, codigo);
-            preparedStatement.setString(2, descripcion);
+            preparedStatement.setString(2, equipoCod);
             preparedStatement.setString(3, estReg);
 
             preparedStatement.executeUpdate();
@@ -239,133 +288,111 @@ public class TorProgram {
 
             // Limpiar campos de texto
             codigoTextField.setText("");
-            descripcionTextField.setText("");
+            equipoComboBox.setSelectedIndex(0);
             estRegTextField.setText("A");
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    /* Comando Modificar; se selecciona con un click el registro de la grilla que se desea modificar,
-se seleccionará el comando Modificar y se carga los datos del registro seleccionado que se desea
-modificar a las cajas de texto del área de Registro. (sólo se puede modificar la descripción,
-protegiendo el dato código y estado de registro). */
-
-    private void modificarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
-
-        if (selectedRow >= 0 && codigoTextField.isEditable() == true) {
-        	
-        	String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
-            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
-
-            codigoTextField.setText(Integer.toString(codigo));
-            codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            estRegTextField.setText(estReg);
-            
-            
-        }
-        else{
-            try {
-            	int codigo = Integer.parseInt(codigoTextField.getText());
-                String descripcion = descripcionTextField.getText();//Nombre del torneo
-                String estReg = estRegTextField.getText();
-                
-                String query = "UPDATE TORNEO SET TorNom = ?, TorEstReg = ? WHERE TorCod = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setInt(1, codigo);
-                preparedStatement.setString(2, descripcion);
-                preparedStatement.setString(3, estReg);
-                preparedStatement.setInt(4, codigo);
-
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
-
-                // Actualizar la tabla
-                loadData();
-
-                // Limpiar campos de texto
-                codigoTextField.setText("");
-                codigoTextField.setEditable(true);
-                descripcionTextField.setText("");
-                descripcionTextField.setEditable(true);
-                estRegTextField.setText("A");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
     }
 
-    /* Comando Eliminar; se selecciona con un click el registro de la grilla que se desea eliminar, se
-seleccionará el comando Eliminar, y se carga los datos del registro seleccionado que se desea
-eliminar a las cajas de texto del área de Registro. (No se puede modificar ningún dato;
-protegiendo el dato código, descripción y estado de registro).*/
+    private void modificarRegistro() throws SQLException {
+        int selectedRow = tablaItems.getSelectedRow();
 
-    private void eliminarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
         if (selectedRow >= 0) {
             String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String equipoCod = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
-            String codigoStr = String.valueOf(codigo);
-
-            codigoTextField.setText(codigoStr);
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            descripcionTextField.setEditable(false);
+            equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            estRegTextField.setText(estReg);
+            estRegTextField.setEditable(false);
+        }
+    }
+
+    private void eliminarRegistro() throws SQLException {
+        int selectedRow = tablaItems.getSelectedRow();
+        if (selectedRow >= 0) {
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String equipoCod = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            
+
+            codigoTextField.setText(codigo);
+            codigoTextField.setEditable(false);
+            equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            equipoComboBox.setEditable(false);
             estRegTextField.setText("*");
         }
     }
 
-    /* Comando Inactivar; se selecciona con un click el registro de la grilla que se desea inactivar; se
-seleccionará el comando Inactivar, y se carga los datos del registro seleccionado que se desea
-inactivar a las cajas de texto del área de Registro. (No se puede modificar ningún dato;
-protegiendo el dato código, descripción y estado de registro). */
-
-    private void inactivarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
+    private void inactivarRegistro() throws SQLException {
+        int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" +  tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String equipoCod = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
-            String codigoStr = String.valueOf(codigo);
-
-            codigoTextField.setText(codigoStr);
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            descripcionTextField.setEditable(false);
+            equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            equipoComboBox.setEditable(false);
             estRegTextField.setText("I");
-
         }
     }
 
-    /* Comando Reactivar; se selecciona con un click el registro de la grilla que se desea reactivar; se
-seleccionará el comando Reactivar, y se carga los datos del registro seleccionado que se desea
-reactivar a las cajas de texto del área de Registro. (No se puede modificar ningún dato;
-protegiendo el dato código, descripción y estado de registro). */
-
-    private void reactivarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
+    private void reactivarRegistro() throws SQLException {
+        int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String equipoCod = (String) "" + tableModel.getValueAt(selectedRow, 1);
 
-            String codigoStr = String.valueOf(codigo);
-
-            codigoTextField.setText(codigoStr);
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            descripcionTextField.setEditable(false);
+            equipoComboBox.setSelectedItem(getEquipoNom(equipoCod));
+            equipoComboBox.setEditable(false);
             estRegTextField.setText("A");
+        }
+    }
+    
+    private void actualizarRegistro() {
+        String codigo = "" + codigoTextField.getText();
+        String equipoNom = (String) "" + equipoComboBox.getSelectedItem();
+        String estReg = (String) "" + estRegTextField.getText();
+        
+        if(codigo.isEmpty() || codigo.isBlank()) {
+            mostrarError("El código está en blanco o no es válido");
+            return;
+        }
+
+        try {
+        	String equipoCod = getEquipoCod(equipoNom);
+            String query = "UPDATE equipo_visitante SET EquCod = ?, EquVisEstReg = ? WHERE EquVisCod = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, equipoCod);
+            preparedStatement.setString(2, estReg);
+            preparedStatement.setString(3, codigo);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            // Actualizar la tabla
+            loadData();
+
+            // Limpiar campos de texto
+            codigoTextField.setText("");
+            codigoTextField.setEditable(true);
+            equipoComboBox.setSelectedIndex(0);
+            equipoComboBox.setEditable(true);
+        } catch (SQLException e) {
+            mostrarError("Error al actualizar el registro: " + e.getMessage());;
         }
     }
 
     private void cancelarRegistro() {
         codigoTextField.setText("");
         codigoTextField.setEditable(true);
-        descripcionTextField.setText("");
-        descripcionTextField.setEditable(true);
+        equipoComboBox.setSelectedIndex(0);
+        equipoComboBox.setEditable(true);
         estRegTextField.setText("A");
     }
 
@@ -375,19 +402,23 @@ protegiendo el dato código, descripción y estado de registro). */
                 connection.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
 
         System.exit(0);
+    }
+    
+    private static void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                TorProgram cargoProgram = new TorProgram();
-                cargoProgram.createAndShowGUI();
+                EquipoVisProgram equipoVisProgram = new EquipoVisProgram();
+                equipoVisProgram.createAndShowGUI();
             } catch (SQLException e) {
-                e.printStackTrace();
+                mostrarError("Error al adicionar el registro: " + e.getMessage());;
             }
         });
     }

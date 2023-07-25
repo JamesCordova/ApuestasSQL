@@ -7,27 +7,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class TorProgram {
+public class CliProgram {
     private Connection connection;
     private Statement statement;
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
-    private JTextField descripcionTextField;
+    private JTextField dniTextField;
+    private JTextField nombreTextField;
     private JTextField estRegTextField;
-    private JTable tablaEstadoRegistro;
+    private JTable tablaItems;
 
-    public TorProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "gimGonza");
+    public CliProgram() throws SQLException {
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
         statement = connection.createStatement();
     }
-
+    
     private Border createTitledBorder(String title) {
         Border border = BorderFactory.createLineBorder(Color.GRAY);
         return BorderFactory.createTitledBorder(border, title);
     }
 
     public void createAndShowGUI() {
-        JFrame frame = new JFrame("Torneo administrador");
+        JFrame frame = new JFrame("Clientes administrador");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -45,7 +46,7 @@ public class TorProgram {
 
     private JPanel createFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(createTitledBorder("Registro de Torneos"));
+        panel.setBorder(createTitledBorder("Registro de Clientes"));
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -56,24 +57,33 @@ public class TorProgram {
         panel.add(codigoLabel, constraints);
 
         constraints.gridx = 1;
-        codigoTextField = new JTextField(8);
+        codigoTextField = new JTextField(10);
         panel.add(codigoTextField, constraints);
 
         constraints.gridy = 1;
         constraints.gridx = 0;
-        JLabel descripcionLabel = new JLabel("Nombre: ");
-        panel.add(descripcionLabel, constraints);
+        JLabel dniLabel = new JLabel("Dni:");
+        panel.add(dniLabel, constraints);
 
         constraints.gridx = 1;
-        descripcionTextField = new JTextField(30);
-        panel.add(descripcionTextField, constraints);
-
+        dniTextField = new JTextField(40);
+        panel.add(dniTextField, constraints);
+        
         constraints.gridy = 2;
+        constraints.gridx = 0;
+        JLabel nombreLabel = new JLabel("Nombre:");
+        panel.add(nombreLabel, constraints);
+
+        constraints.gridx = 1;
+        nombreTextField = new JTextField(32);
+        panel.add(nombreTextField, constraints);
+        
+        constraints.gridy = 3;
         constraints.gridx = 0;
         JLabel estRegLabel = new JLabel("Estado Registro:");
         panel.add(estRegLabel, constraints);
 
-        constraints.gridy = 2;
+        constraints.gridy = 3;
         constraints.gridx = 1;
         estRegTextField = new JTextField(2);
         estRegTextField.setText("A");
@@ -84,12 +94,12 @@ public class TorProgram {
     }
 
     private JPanel createTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new FlowLayout());
+        
+        panel.setBorder(createTitledBorder("Tabla de Clientes"));
 
-        panel.setBorder(createTitledBorder("Tabla de torneos"));
-
-        tablaEstadoRegistro = new JTable();
-        JScrollPane scrollPane = new JScrollPane(tablaEstadoRegistro);
+        tablaItems = new JTable();
+        JScrollPane scrollPane = new JScrollPane(tablaItems);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -113,7 +123,7 @@ public class TorProgram {
             }
         });
         panel1.add(updateButton);
-
+        
         JButton deleteButton = new JButton("Eliminar");
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -154,7 +164,7 @@ public class TorProgram {
         JButton actualizarButton = new JButton("Actualizar");
         actualizarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                modificarRegistro();
+                actualizarRegistro();
             }
         });
         panel2.add(actualizarButton);
@@ -172,10 +182,10 @@ public class TorProgram {
         finalPanel.add(panel2, BorderLayout.SOUTH);
         return finalPanel;
     }
-    
+
     private void loadData() {
         try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM torneo");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM cliente");
             ResultSetMetaData metaData = resultSet.getMetaData();
 
             // Obtener la cantidad de columnas
@@ -199,9 +209,9 @@ public class TorProgram {
             }
 
             // Asignar el modelo a la tabla
-            tablaEstadoRegistro.setModel(tableModel);
+            tablaItems.setModel(tableModel);
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
     }
 
@@ -221,15 +231,21 @@ public class TorProgram {
 
     private void adicionarRegistro() {
         String codigo = codigoTextField.getText();
-        String descripcion = descripcionTextField.getText();
+        String dni = dniTextField.getText();
+        String nombre = nombreTextField.getText();
         String estReg = estRegTextField.getText();
+        
+        if(codigo.isEmpty() || codigo.isBlank()) {
+        	mostrarError("El código esta en blanco o no es válido");
+        }
 
         try {
-            String query = "INSERT INTO torneo (TorCod, TorNom, TorEstReg) VALUES (?, ?, ?)";
+            String query = "INSERT INTO CLIENTE (CliCod, CliDni, CliNom, CliEstReg) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, codigo);
-            preparedStatement.setString(2, descripcion);
-            preparedStatement.setString(3, estReg);
+            preparedStatement.setString(2, dni);
+            preparedStatement.setString(3, nombre);
+            preparedStatement.setString(4, estReg);
 
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -238,11 +254,9 @@ public class TorProgram {
             loadData();
 
             // Limpiar campos de texto
-            codigoTextField.setText("");
-            descripcionTextField.setText("");
-            estRegTextField.setText("A");
+            cancelarRegistro();
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
     }
     /* Comando Modificar; se selecciona con un click el registro de la grilla que se desea modificar,
@@ -251,33 +265,36 @@ modificar a las cajas de texto del área de Registro. (sólo se puede modificar 
 protegiendo el dato código y estado de registro). */
 
     private void modificarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
+        int selectedRow = tablaItems.getSelectedRow();
 
         if (selectedRow >= 0 && codigoTextField.isEditable() == true) {
         	
         	String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
-            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
+            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
 
-            codigoTextField.setText(Integer.toString(codigo));
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
+            dniTextField.setText(dni);
+            nombreTextField.setText(nombre);
             estRegTextField.setText(estReg);
             
             
         }
         else{
             try {
-            	int codigo = Integer.parseInt(codigoTextField.getText());
-                String descripcion = descripcionTextField.getText();//Nombre del torneo
+            	String codigo = codigoTextField.getText();
+                String dni = dniTextField.getText();
+                String nombre = nombreTextField.getText();
                 String estReg = estRegTextField.getText();
                 
-                String query = "UPDATE TORNEO SET TorNom = ?, TorEstReg = ? WHERE TorCod = ?";
+                String query = "UPDATE cliente SET CliDni = ?, CliNom = ?, CliEstReg = ? WHERE CliCod = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setInt(1, codigo);
-                preparedStatement.setString(2, descripcion);
+                preparedStatement.setString(1, dni);
+                preparedStatement.setString(2, nombre);
                 preparedStatement.setString(3, estReg);
-                preparedStatement.setInt(4, codigo);
+                preparedStatement.setString(4, codigo);
 
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
@@ -286,13 +303,9 @@ protegiendo el dato código y estado de registro). */
                 loadData();
 
                 // Limpiar campos de texto
-                codigoTextField.setText("");
-                codigoTextField.setEditable(true);
-                descripcionTextField.setText("");
-                descripcionTextField.setEditable(true);
-                estRegTextField.setText("A");
+                cancelarRegistro();
             } catch (SQLException e) {
-                e.printStackTrace();
+                mostrarError("Error al modificar el registro: " + e.getMessage());;
             }
         }
     }
@@ -303,19 +316,22 @@ eliminar a las cajas de texto del área de Registro. (No se puede modificar ning
 protegiendo el dato código, descripción y estado de registro).*/
 
     private void eliminarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
+        int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
-            String codigoStr = String.valueOf(codigo);
-
-            codigoTextField.setText(codigoStr);
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            descripcionTextField.setEditable(false);
+            dniTextField.setText(dni);
+            dniTextField.setEditable(false);
+            nombreTextField.setText(nombre);
+            nombreTextField.setEditable(false);
             estRegTextField.setText("*");
+
         }
+
     }
 
     /* Comando Inactivar; se selecciona con un click el registro de la grilla que se desea inactivar; se
@@ -324,17 +340,18 @@ inactivar a las cajas de texto del área de Registro. (No se puede modificar nin
 protegiendo el dato código, descripción y estado de registro). */
 
     private void inactivarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
+        int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
-            String codigo = (String) "" +  tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" +  tableModel.getValueAt(selectedRow, 1);
+            String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
-            String codigoStr = String.valueOf(codigo);
-
-            codigoTextField.setText(codigoStr);
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            descripcionTextField.setEditable(false);
+            dniTextField.setText(dni);
+            dniTextField.setEditable(false);
+            nombreTextField.setText(nombre);
+            nombreTextField.setEditable(false);
             estRegTextField.setText("I");
 
         }
@@ -346,26 +363,59 @@ reactivar a las cajas de texto del área de Registro. (No se puede modificar nin
 protegiendo el dato código, descripción y estado de registro). */
 
     private void reactivarRegistro() {
-        int selectedRow = tablaEstadoRegistro.getSelectedRow();
+        int selectedRow = tablaItems.getSelectedRow();
         if (selectedRow >= 0) {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
-            String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
+            String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
-            String codigoStr = String.valueOf(codigo);
-
-            codigoTextField.setText(codigoStr);
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
-            descripcionTextField.setText(descripcion);
-            descripcionTextField.setEditable(false);
+            dniTextField.setText(dni);
+            dniTextField.setEditable(false);
+            nombreTextField.setText(nombre);
+            nombreTextField.setEditable(false);
             estRegTextField.setText("A");
+
+        }
+    }
+    
+    private void actualizarRegistro() {
+    	String codigo = null;
+        String dni = null;
+        String nombre = null;
+        String estReg = null;
+    	try {
+        	codigo = codigoTextField.getText();
+            dni = dniTextField.getText();
+            nombre = nombreTextField.getText();
+            estReg = estRegTextField.getText();
+            
+            String query = "UPDATE cliente SET CliDni = ?, CliNom = ?, CliEstReg = ? WHERE CliCod = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, dni);
+            preparedStatement.setString(2, nombre);
+            preparedStatement.setString(3, estReg);
+            preparedStatement.setString(4, codigo);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            // Actualizar la tabla
+            loadData();
+
+            // Limpiar campos de texto
+            cancelarRegistro();
+        } catch (SQLException e) {
+            mostrarError("Error al actualizar el registro: " + e.getMessage());;
         }
     }
 
     private void cancelarRegistro() {
         codigoTextField.setText("");
         codigoTextField.setEditable(true);
-        descripcionTextField.setText("");
-        descripcionTextField.setEditable(true);
+        dniTextField.setText("");
+        dniTextField.setEditable(true);
         estRegTextField.setText("A");
     }
 
@@ -375,19 +425,27 @@ protegiendo el dato código, descripción y estado de registro). */
                 connection.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            mostrarError("Error al adicionar el registro: " + e.getMessage());;
         }
 
         System.exit(0);
     }
+    
+    private static void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    
+    
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                TorProgram cargoProgram = new TorProgram();
+                CliProgram cargoProgram = new CliProgram();
                 cargoProgram.createAndShowGUI();
             } catch (SQLException e) {
-                e.printStackTrace();
+                mostrarError("Error al adicionar el registro: " + e.getMessage());;
             }
         });
     }
