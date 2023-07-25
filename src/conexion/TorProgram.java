@@ -17,7 +17,7 @@ public class TorProgram {
     private JTable tablaEstadoRegistro;
 
     public TorProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "gimGonza");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
         statement = connection.createStatement();
     }
 
@@ -259,7 +259,7 @@ protegiendo el dato código y estado de registro). */
             String descripcion = (String) "" + tableModel.getValueAt(selectedRow, 1);
             String estReg = (String) "" + tableModel.getValueAt(selectedRow, 2);
 
-            codigoTextField.setText(Integer.toString(codigo));
+            codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
             descripcionTextField.setText(descripcion);
             estRegTextField.setText(estReg);
@@ -274,10 +274,9 @@ protegiendo el dato código y estado de registro). */
                 
                 String query = "UPDATE TORNEO SET TorNom = ?, TorEstReg = ? WHERE TorCod = ?";
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setInt(1, codigo);
-                preparedStatement.setString(2, descripcion);
-                preparedStatement.setString(3, estReg);
-                preparedStatement.setInt(4, codigo);
+                preparedStatement.setString(1, descripcion);
+                preparedStatement.setString(2, estReg);
+                preparedStatement.setInt(3, codigo);
 
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
