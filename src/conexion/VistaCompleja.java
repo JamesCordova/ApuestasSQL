@@ -21,8 +21,7 @@ public class VistaCompleja extends JFrame {
 
         try {
             // Establecer la conexión a la base de datos
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/CasaApuestas", "root", "admin");
-
+            Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/orcl", "casaapuestas", "admin");
             // Crear la consulta SQL
             String consulta = "SELECT\r\n"
             		+ "  AC.ApuCod AS Apuesta_Cabecera,\r\n"
@@ -40,17 +39,17 @@ public class VistaCompleja extends JFrame {
             		+ "  EVis.EquNom AS Equipo_Visitante,\r\n"
             		+ "  AD.ApuDetCuo AS Cuota,\r\n"
             		+ "  EGan.EquNom AS Equipo_Ganador\r\n"
-            		+ "FROM APUESTA_CAB AS AC\r\n"
-            		+ "JOIN APUESTA_DET AS AD ON AC.ApuCod = AD.ApuCabCod\r\n"
-            		+ "JOIN CLIENTE AS C ON AC.ApuCliCod = C.CliCod\r\n"
-            		+ "LEFT JOIN AFILIADO AS A ON AC.ApuAfiCod = A.AfiCod\r\n"
-            		+ "JOIN PARTIDO AS P ON AD.ApuDetParCod = P.ParCod\r\n"
-            		+ "JOIN EQUIPO_LOCAL AS EL ON P.ParEquLocCod = EL.EquLocCod\r\n"
-            		+ "JOIN EQUIPO AS ELoc ON EL.EquCod = ELoc.EquCod\r\n"
-            		+ "JOIN EQUIPO_VISITANTE AS EV ON P.ParEquVisCod = EV.EquVisCod\r\n"
-            		+ "JOIN EQUIPO AS EVis ON EV.EquCod = EVis.EquCod\r\n"
-            		+ "JOIN TORNEO AS T ON P.ParTorCod = T.TorCod\r\n"
-            		+ "LEFT JOIN EQUIPO AS EGan ON P.ParGanCod = EGan.EquCod;";
+            		+ "FROM APUESTA_CAB AC\r\n"
+            		+ "JOIN APUESTA_DET AD ON AC.ApuCod = AD.ApuCabCod\r\n"
+            		+ "JOIN CLIENTE C ON AC.ApuCliCod = C.CliCod\r\n"
+            		+ "LEFT JOIN AFILIADO A ON AC.ApuAfiCod = A.AfiCod\r\n"
+            		+ "JOIN PARTIDO P ON AD.ApuDetParCod = P.ParCod\r\n"
+            		+ "JOIN EQUIPO_LOCAL EL ON P.ParEquLocCod = EL.EquLocCod\r\n"
+            		+ "JOIN EQUIPO ELoc ON EL.EquCod = ELoc.EquCod\r\n"
+            		+ "JOIN EQUIPO_VISITANTE EV ON P.ParEquVisCod = EV.EquVisCod\r\n"
+            		+ "JOIN EQUIPO EVis ON EV.EquCod = EVis.EquCod\r\n"
+            		+ "JOIN TORNEO T ON P.ParTorCod = T.TorCod\r\n"
+            		+ "LEFT JOIN EQUIPO EGan ON P.ParGanCod = EGan.EquCod";
 
             // Ejecutar la consulta
             Statement statement = connection.createStatement();

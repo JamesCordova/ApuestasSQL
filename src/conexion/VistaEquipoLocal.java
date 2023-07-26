@@ -21,15 +21,15 @@ public class VistaEquipoLocal extends JFrame {
 
         try {
             // Establecer la conexión a la base de datos
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/CasaApuestas", "root", "admin");
+            Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/orcl", "casaapuestas", "admin");
 
             // Crear la consulta SQL
-            String consulta = "SELECT \r\n"
-            		+ " ELoc.EquLocCod,\r\n"
-            		+ " E.EquNom,\r\n"
-            		+ " ELoc.EquLocEstReg\r\n"
-            		+ "FROM EQUIPO AS E INNER \r\n"
-            		+ "JOIN EQUIPO_LOCAL AS ELoc ON E.EquCod = ELoc.EquCod;";
+            String consulta = "SELECT\r\n"
+            		+ "  ELoc.EquLocCod,\r\n"
+            		+ "  E.EquNom,\r\n"
+            		+ "  ELoc.EquLocEstReg\r\n"
+            		+ "FROM EQUIPO E\r\n"
+            		+ "JOIN EQUIPO_LOCAL ELoc ON E.EquCod = ELoc.EquCod";
 
             // Ejecutar la consulta
             Statement statement = connection.createStatement();

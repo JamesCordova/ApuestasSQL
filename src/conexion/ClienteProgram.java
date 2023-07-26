@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class ClienteProgram {
-    private Connection connection;
-    private Statement statement;
+public class ClienteProgram extends GuiProgram {
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
     private JTextField dniTextField;
@@ -19,8 +17,7 @@ public class ClienteProgram {
     private JTable tablaItems;
 
     public ClienteProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {
@@ -301,7 +298,7 @@ public class ClienteProgram {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
             String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
             String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
-            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
+            // String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -319,7 +316,7 @@ public class ClienteProgram {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
             String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
             String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
-            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
+            // String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);
@@ -337,7 +334,7 @@ public class ClienteProgram {
             String codigo = (String) "" + tableModel.getValueAt(selectedRow, 0);
             String dni = (String) "" + tableModel.getValueAt(selectedRow, 1);
             String nombre = (String) "" + tableModel.getValueAt(selectedRow, 2);
-            String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
+            // String estReg = (String) "" + tableModel.getValueAt(selectedRow, 3);
 
             codigoTextField.setText(codigo);
             codigoTextField.setEditable(false);

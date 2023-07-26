@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class ApuestaProgramV3 {
-    private Connection connection;
-    private Statement statement;
+public class ApuestaProgramV3 extends GuiProgram {
     private DefaultTableModel cabTableModel;
     private DefaultTableModel detTableModel;
     private JTextField apuCodTextField;
@@ -28,8 +26,7 @@ public class ApuestaProgramV3 {
     private JTable detTablaItems;
 
     public ApuestaProgramV3() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {
@@ -250,7 +247,6 @@ public class ApuestaProgramV3 {
         int selectedRow = cabTablaItems.getSelectedRow();
 
         if (selectedRow >= 0) {
-            String apuCabCod = cabTablaItems.getValueAt(selectedRow, 0).toString();
 
             try {
                 ResultSet detResultSet = statement.executeQuery("SELECT * FROM APUESTA_DET");

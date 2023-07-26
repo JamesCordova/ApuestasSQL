@@ -11,9 +11,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.text.ParseException;
 
-public class ApuestaProgram {
-    private Connection connection;
-    private Statement statement;
+public class ApuestaProgram extends GuiProgram {
     private DefaultTableModel cabeceraTableModel;
     private DefaultTableModel detalleTableModel;
     private JTextField apuCodTextField;
@@ -28,8 +26,7 @@ public class ApuestaProgram {
     private JTable detalleTablaItems;
 
     public ApuestaProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {

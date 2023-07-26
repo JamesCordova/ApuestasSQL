@@ -11,9 +11,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.text.ParseException;
 
-public class ApuestaProgramV5_1 {
-    private Connection connection;
-    private Statement statement;
+public class ApuestaProgramV5_1 extends GuiProgram{
     private DefaultTableModel cabeceraTableModel;
     private DefaultTableModel detalleTableModel;
     private JTextField apuCodTextField;
@@ -28,8 +26,7 @@ public class ApuestaProgramV5_1 {
     private JTable detalleTablaItems;
 
     public ApuestaProgramV5_1() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {
@@ -384,14 +381,14 @@ public class ApuestaProgramV5_1 {
             String apuCod = (String) cabeceraTableModel.getValueAt(selectedRow, 0);
             String apuCliCod = (String) cabeceraTableModel.getValueAt(selectedRow, 1);
             String apuAfiCod = (String) cabeceraTableModel.getValueAt(selectedRow, 2);
-            String apuFecAño = (String) cabeceraTableModel.getValueAt(selectedRow, 3);
+            /*String apuFecAño = (String) cabeceraTableModel.getValueAt(selectedRow, 3);
             String apuFecMes = (String) cabeceraTableModel.getValueAt(selectedRow, 4);
             String apuFecDia = (String) cabeceraTableModel.getValueAt(selectedRow, 5);
             String apuFecHor = (String) cabeceraTableModel.getValueAt(selectedRow, 6);
-            String apuFecMin = (String) cabeceraTableModel.getValueAt(selectedRow, 7);
+            String apuFecMin = (String) cabeceraTableModel.getValueAt(selectedRow, 7);*/
             String apuTip = (String) cabeceraTableModel.getValueAt(selectedRow, 8);
             String apuValApo = (String) cabeceraTableModel.getValueAt(selectedRow, 9);
-            String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
+            // String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
 
             // Actualizar los campos de texto con los valores del registro seleccionado
             apuCodTextField.setText(apuCod);

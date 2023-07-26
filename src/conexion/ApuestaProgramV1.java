@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class ApuestaProgramV1 {
-    private Connection connection;
-    private Statement statement;
+public class ApuestaProgramV1 extends GuiProgram {
     private DefaultTableModel cabeceraTableModel;
     private DefaultTableModel detalleTableModel;
     private JTextField apuCodTextField;
@@ -26,11 +24,10 @@ public class ApuestaProgramV1 {
     private JTextField apuEstRegTextField;
     private JTable cabeceraTabla;
     private JTable detalleTabla;
-    private JComboBox<String> apuCabCodComboBox;
+    // private JComboBox<String> apuCabCodComboBox;
 
     public ApuestaProgramV1() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {
@@ -472,7 +469,7 @@ public class ApuestaProgramV1 {
             String apuFecMin = (String) cabeceraTableModel.getValueAt(selectedRow, 7);
             String apuTip = (String) cabeceraTableModel.getValueAt(selectedRow, 8);
             String apuValApo = (String) cabeceraTableModel.getValueAt(selectedRow, 9);
-            String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
+            // String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
 
             apuCodTextField.setText(apuCod);
             apuCodTextField.setEditable(false);
@@ -511,7 +508,7 @@ public class ApuestaProgramV1 {
             String apuFecMin = (String) cabeceraTableModel.getValueAt(selectedRow, 7);
             String apuTip = (String) cabeceraTableModel.getValueAt(selectedRow, 8);
             String apuValApo = (String) cabeceraTableModel.getValueAt(selectedRow, 9);
-            String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
+            // String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
 
             apuCodTextField.setText(apuCod);
             apuCodTextField.setEditable(false);
@@ -609,7 +606,7 @@ public class ApuestaProgramV1 {
     private void relacionarDetalle() {
         int selectedRow = cabeceraTabla.getSelectedRow();
         if (selectedRow >= 0) {
-            String apuCod = (String) cabeceraTableModel.getValueAt(selectedRow, 0);
+            // String apuCod = (String) cabeceraTableModel.getValueAt(selectedRow, 0);
 
             // Ejemplo de cómo relacionar el detalle a la cabecera usando apuCod
             // ...

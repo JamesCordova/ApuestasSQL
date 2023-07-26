@@ -21,7 +21,7 @@ public class ConsultaCombinada extends JFrame {
 
         try {
             // Establecer la conexión a la base de datos
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/CasaApuestas", "root", "admin");
+            Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/orcl", "casaapuestas", "admin");
 
             // Crear la consulta SQL
             String consulta = "SELECT C.*, D.ApuDetParCod, D.ApuDetCuo " +

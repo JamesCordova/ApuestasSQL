@@ -7,9 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class EquipoVisProgram {
-    private Connection connection;
-    private Statement statement;
+public class EquipoVisProgram extends GuiProgram {
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
     private JComboBox<String> equipoComboBox;
@@ -17,8 +15,7 @@ public class EquipoVisProgram {
     private JTable tablaItems;
 
     public EquipoVisProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
     
     private Border createTitledBorder(String title) {

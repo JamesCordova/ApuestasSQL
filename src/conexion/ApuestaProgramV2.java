@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class ApuestaProgramV2 {
-    private Connection connection;
-    private Statement statement;
+public class ApuestaProgramV2 extends GuiProgram {
     private DefaultTableModel cabeceraTableModel;
     private DefaultTableModel detalleTableModel;
     private JTextField codigoTextField;
@@ -24,8 +22,7 @@ public class ApuestaProgramV2 {
     private JTable detalleTabla;
 
     public ApuestaProgramV2() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {

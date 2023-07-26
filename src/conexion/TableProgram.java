@@ -10,9 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TableProgram {
-	private Connection connection;
-	private Statement statement;
+public class TableProgram extends GuiProgram {
 	private DefaultTableModel tableModel;
 	private JTextField[] textFields;
 	private JTable tablaItems;
@@ -21,11 +19,10 @@ public class TableProgram {
 	private String columnEstReg;
 
 	public TableProgram(String table) throws SQLException {
-		connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
+		super();
 		tablaEstReg = "estado_registro";
 		columnEstReg = "EstReg";
 		selectedTable = table;
-		statement = connection.createStatement();
 	}
 
 	private Border createTitledBorder(String title) {

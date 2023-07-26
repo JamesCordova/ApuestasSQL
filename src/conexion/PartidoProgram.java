@@ -11,9 +11,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.text.ParseException;
 
-public class PartidoProgram {
-    private Connection connection;
-    private Statement statement;
+public class PartidoProgram extends GuiProgram {
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
     private JComboBox<String> torneoComboBox;
@@ -26,8 +24,7 @@ public class PartidoProgram {
     private JTable tablaItems;
 
     public PartidoProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {

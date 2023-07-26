@@ -7,9 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class CliProgram {
-    private Connection connection;
-    private Statement statement;
+public class CliProgram extends GuiProgram {
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
     private JTextField dniTextField;
@@ -18,8 +16,7 @@ public class CliProgram {
     private JTable tablaItems;
 
     public CliProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
     
     private Border createTitledBorder(String title) {

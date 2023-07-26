@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class ApuestaProgramV5 {
-    private Connection connection;
-    private Statement statement;
+public class ApuestaProgramV5 extends GuiProgram{
     private DefaultTableModel cabeceraTableModel;
     private DefaultTableModel detalleTableModel;
     private JTextField apuCodTextField;
@@ -27,8 +25,7 @@ public class ApuestaProgramV5 {
     private JTable detalleTablaItems;
 
     public ApuestaProgramV5() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {
@@ -386,7 +383,7 @@ public class ApuestaProgramV5 {
             String apuFecMin = (String) cabeceraTableModel.getValueAt(selectedRow, 7);
             String apuTip = (String) cabeceraTableModel.getValueAt(selectedRow, 8);
             String apuValApo = (String) cabeceraTableModel.getValueAt(selectedRow, 9);
-            String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
+            // String apuEstReg = (String) cabeceraTableModel.getValueAt(selectedRow, 10);
 
             // Actualizar los campos de texto con los valores del registro seleccionado
             apuCodTextField.setText(apuCod);

@@ -3,13 +3,11 @@ package conexion;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.MaskFormatter;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.text.ParseException;
 
 public class ApuestaDetProgram extends GuiProgram {
 	private DefaultTableModel tableModel;
