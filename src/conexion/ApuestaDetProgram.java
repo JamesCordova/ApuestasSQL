@@ -11,9 +11,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.text.ParseException;
 
-public class ApuestaDetProgram {
-	private Connection connection;
-	private Statement statement;
+public class ApuestaDetProgram extends GuiProgram {
 	private DefaultTableModel tableModel;
 	private JTextField codigoTextField;
 	private JComboBox<String> cabeceraComboBox;
@@ -23,8 +21,7 @@ public class ApuestaDetProgram {
 	private JTable tablaItems;
 
 	public ApuestaDetProgram() throws SQLException {
-		connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-		statement = connection.createStatement();
+		super();
 	}
 
 	private Border createTitledBorder(String title) {

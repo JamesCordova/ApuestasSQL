@@ -7,9 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
-public class TorProgram {
-    private Connection connection;
-    private Statement statement;
+public class TorProgram extends GuiProgram {
     private DefaultTableModel tableModel;
     private JTextField codigoTextField;
     private JTextField descripcionTextField;
@@ -17,8 +15,7 @@ public class TorProgram {
     private JTable tablaEstadoRegistro;
 
     public TorProgram() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/casaapuestas", "root", "admin");
-        statement = connection.createStatement();
+        super();
     }
 
     private Border createTitledBorder(String title) {
