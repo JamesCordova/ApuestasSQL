@@ -16,10 +16,10 @@ public class ApuestaProgram extends GuiProgram {
     private DefaultTableModel detalleTableModel;
     private JTextField apuCodTextField;
     private JTextField apuCliCodTextField;
-    private JTextField apuAfiCodTextField;
+    private JComboBox<String> apuAfiComboBox;
     private JTextField apuFecAñoMesDiaTextField;
     private JTextField apuFecHorMinTextField;
-    private JTextField apuTipTextField;
+    private JComboBox<String> apuTipComboBox;
     private JTextField apuValApoTextField;
     private JTextField apuEstRegTextField;
     private JTable cabeceraTablaItems;
@@ -50,6 +50,8 @@ public class ApuestaProgram extends GuiProgram {
 
         loadCabeceraData();
         loadDetalleData();
+        loadAfiliados();
+        loadTiposApu();
     }
 
     private JPanel createFormPanel() {
@@ -83,8 +85,8 @@ public class ApuestaProgram extends GuiProgram {
         panel.add(apuAfiCodLabel, constraints);
 
         constraints.gridx = 1;
-        apuAfiCodTextField = new JTextField(10);
-        panel.add(apuAfiCodTextField, constraints);
+        apuAfiComboBox = new JComboBox<>();
+        panel.add(apuAfiComboBox, constraints);
 
         constraints.gridy = 3;
         constraints.gridx = 0;
@@ -128,8 +130,8 @@ public class ApuestaProgram extends GuiProgram {
         panel.add(apuTipLabel, constraints);
 
         constraints.gridx = 1;
-        apuTipTextField = new JTextField(10);
-        panel.add(apuTipTextField, constraints);
+        apuTipComboBox = new JComboBox<>();
+        panel.add(apuTipComboBox, constraints);
 
         constraints.gridy = 6;
         constraints.gridx = 0;
@@ -166,6 +168,8 @@ public class ApuestaProgram extends GuiProgram {
         detalleTablaItems = new JTable();
         JScrollPane detalleScrollPane = new JScrollPane(detalleTablaItems);
         panel.add(detalleScrollPane);
+        cabeceraTablaItems.setDefaultEditor(Object.class, null);
+        detalleTablaItems.setDefaultEditor(Object.class, null);
 
         return panel;
     }
@@ -275,6 +279,7 @@ public class ApuestaProgram extends GuiProgram {
             }
 
             // Asignar el modelo a la tabla
+            cabeceraTablaItems.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
             cabeceraTablaItems.setModel(cabeceraTableModel);
         } catch (SQLException e) {
             mostrarError("Error al cargar los datos de APUESTA_CAB: " + e.getMessage());
@@ -312,12 +317,39 @@ public class ApuestaProgram extends GuiProgram {
             mostrarError("Error al cargar los datos de APUESTA_DET: " + e.getMessage());
         }
     }
+    
+    private void loadAfiliados() {
+    	try {
+			ResultSet resultSet = statement.executeQuery("SELECT * FROM afiliado");
+			while (resultSet.next()) {
+				String codigo = resultSet.getString("afiCod");
+				apuAfiComboBox.addItem(codigo);
+			}
+		} catch (SQLException e) {
+			mostrarError("Error al cargar los afiliados: " + e.getMessage());
+		}
+    }
+    
+    private void loadTiposApu() {
+//    	try {
+//			ResultSet resultSet = statement.executeQuery("SELECT * FROM afiliado");
+//			while (resultSet.next()) {
+//				String codigo = resultSet.getString("afiCod");
+//				apuAfiComboBox.addItem(codigo);
+//			}
+    		apuTipComboBox.addItem("Normal");
+    		apuTipComboBox.addItem("Simple");
+    		apuTipComboBox.addItem("Compuesta");
+//		} catch (SQLException e) {
+//			mostrarError("Error al cargar los tipos: " + e.getMessage());
+//		}
+    }
 
     private void adicionarRegistro() {
         // Obtener los valores de los campos de texto
         String apuCod = apuCodTextField.getText();
         String apuCliCod = apuCliCodTextField.getText();
-        String apuAfiCod = apuAfiCodTextField.getText();
+        String apuAfiCod = apuAfiComboBox.getSelectedItem().toString();
         String apuFecAñoMesDia = apuFecAñoMesDiaTextField.getText();
         String apuFecAño = apuFecAñoMesDia.substring(0,4);
         String apuFecMes = apuFecAñoMesDia.substring(5,7);
@@ -325,7 +357,7 @@ public class ApuestaProgram extends GuiProgram {
         String apuFecHorMin = apuFecHorMinTextField.getText();
         String apuFecHor = apuFecHorMin.substring(0,2);
         String apuFecMin = apuFecHorMin.substring(3);
-        String apuTip = apuTipTextField.getText();
+        String apuTip = apuTipComboBox.getSelectedItem().toString();
         String apuValApo = apuValApoTextField.getText();
         String apuEstReg = apuEstRegTextField.getText();
 
@@ -375,10 +407,10 @@ public class ApuestaProgram extends GuiProgram {
             apuEstRegTextField.setText(apuEstReg);
             // Habilitando edición
             apuCliCodTextField.setEditable(true);
-            apuAfiCodTextField.setEditable(true);
+            apuAfiComboBox.setEditable(true);
             apuFecAñoMesDiaTextField.setEditable(true);
             apuFecHorMinTextField.setEditable(true);
-            apuTipTextField.setEditable(true);
+            apuTipComboBox.setEditable(true);
             apuValApoTextField.setEditable(true);
 
         }
@@ -432,14 +464,14 @@ public class ApuestaProgram extends GuiProgram {
     	apuCodTextField.setEditable(true);
         apuCliCodTextField.setText("");
         apuCliCodTextField.setEditable(true);
-        apuAfiCodTextField.setText("");
-        apuAfiCodTextField.setEditable(true);
+        apuAfiComboBox.setSelectedIndex(0);
+        apuAfiComboBox.setEditable(true);
         apuFecAñoMesDiaTextField.setText("");
         apuFecAñoMesDiaTextField.setEditable(true);
         apuFecHorMinTextField.setText("");
         apuFecHorMinTextField.setEditable(true);
-        apuTipTextField.setText("");
-        apuTipTextField.setEditable(true);
+        apuTipComboBox.setSelectedIndex(0);
+        apuTipComboBox.setEditable(true);
         apuValApoTextField.setText("");
         apuValApoTextField.setEditable(true);
         apuEstRegTextField.setText("A");
@@ -491,14 +523,14 @@ public class ApuestaProgram extends GuiProgram {
                 apuCodTextField.setEditable(false);
                 apuCliCodTextField.setText(apuCliCod);
                 apuCliCodTextField.setEditable(false);
-                apuAfiCodTextField.setText(apuAfiCod);
-                apuAfiCodTextField.setEditable(false);
+                apuAfiComboBox.setSelectedItem(apuAfiCod);
+                apuAfiComboBox.setEditable(false);
                 apuFecAñoMesDiaTextField.setText(apuFecAñoMesDia);
                 apuFecAñoMesDiaTextField.setEditable(false);
                 apuFecHorMinTextField.setText(apuFecHorMin);
                 apuFecHorMinTextField.setEditable(false);
-                apuTipTextField.setText(apuTip);
-                apuTipTextField.setEditable(false);
+                apuTipComboBox.setSelectedItem(apuTip);
+                apuTipComboBox.setEditable(false);
                 apuValApoTextField.setText(apuValApo);
                 apuValApoTextField.setEditable(false);
            }
@@ -512,7 +544,7 @@ public class ApuestaProgram extends GuiProgram {
         // Obtener los valores de los campos de texto
     	String apuCod = apuCodTextField.getText();
         String apuCliCod = apuCliCodTextField.getText();
-        String apuAfiCod = apuAfiCodTextField.getText();
+        String apuAfiCod = apuAfiComboBox.getSelectedItem().toString();
         String apuFecAñoMesDia = apuFecAñoMesDiaTextField.getText();
         String apuFecAño = apuFecAñoMesDia.substring(0,4);
         String apuFecMes = apuFecAñoMesDia.substring(5,7);
@@ -520,7 +552,7 @@ public class ApuestaProgram extends GuiProgram {
         String apuFecHorMin = apuFecHorMinTextField.getText();
         String apuFecHor = apuFecHorMin.substring(0,2);;
         String apuFecMin = apuFecHorMin.substring(3);
-        String apuTip = apuTipTextField.getText();
+        String apuTip = apuTipComboBox.getSelectedItem().toString();
         String apuValApo = apuValApoTextField.getText();
         String apuEstReg = apuEstRegTextField.getText();
 
